@@ -1,0 +1,196 @@
+[gd_scene load_steps=14 format=3 uid="uid://bylrlo3yuqiux"]
+
+[ext_resource type="Script" path="res://scripts/client.gd" id="1_kb2rc"]
+[ext_resource type="PackedScene" uid="uid://dml3pjnytvphd" path="res://scenes/network_container.tscn" id="2_qrcjs"]
+[ext_resource type="PackedScene" uid="uid://cbpueawmxyb1q" path="res://scenes/wire_box.tscn" id="3_xhlj5"]
+[ext_resource type="PackedScene" uid="uid://ddyxx4je7riel" path="res://scenes/claim_ui.tscn" id="4_aacon"]
+[ext_resource type="PackedScene" uid="uid://ptp1audfchxn" path="res://scenes/round_number.tscn" id="4_okqro"]
+[ext_resource type="Theme" uid="uid://dss4hlpng3bfh" path="res://theme/default.tres" id="5_focx7"]
+[ext_resource type="Texture2D" uid="uid://n4wyictegnum" path="res://art/role_pic/good_guy.png" id="6_ae8ts"]
+[ext_resource type="PackedScene" uid="uid://bk15ap3u2cei8" path="res://scenes/declare_window.tscn" id="6_wjk8f"]
+[ext_resource type="PackedScene" uid="uid://dt2view55rd56" path="res://scenes/explode_animation.tscn" id="7_oq2x6"]
+[ext_resource type="PackedScene" uid="uid://cl04ovbrt34te" path="res://scenes/history.tscn" id="8_me2h0"]
+[ext_resource type="PackedScene" uid="uid://blyctx4q4sohe" path="res://scenes/ending_panel.tscn" id="9_b7fki"]
+[ext_resource type="PackedScene" uid="uid://cda30asktagbr" path="res://scenes/round_recap.tscn" id="12_ab8y5"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_i5imn"]
+
+[node name="Client" type="Node" node_paths=PackedStringArray("pause_panel", "claim_ui", "my_wire_box", "their_wire_box_ui", "in_game_ui", "role_texture", "round_number", "remaining_defuse_label", "declare_window", "player_card_grid_ui", "explode_panel", "ending_panel", "round_recap")]
+script = ExtResource("1_kb2rc")
+pause_panel = NodePath("InGameUI/PausePanel")
+claim_ui = NodePath("InGameUI/ClaimUI")
+my_wire_box = NodePath("InGameUI/MyWireBox")
+their_wire_box_ui = NodePath("InGameUI/TheirWireBox")
+in_game_ui = NodePath("InGameUI")
+role_texture = NodePath("InGameUI/RoleCon/TextureRect")
+round_number = NodePath("InGameUI/GameInfoCon/RoundNumber")
+remaining_defuse_label = NodePath("InGameUI/GameInfoCon/RemainDefuseCon/Number")
+declare_window = NodePath("InGameUI/DeclareWindow")
+player_card_grid_ui = NodePath("InGameUI/ScrollContainer/PlayerCardGrid")
+explode_panel = NodePath("ExplodePanel")
+ending_panel = NodePath("EndingPanel")
+round_recap = NodePath("InGameUI/RoundRecap")
+
+[node name="NetworkContainer" parent="." instance=ExtResource("2_qrcjs")]
+metadata/_edit_use_anchors_ = true
+
+[node name="InGameUI" type="Panel" parent="."]
+visible = false
+custom_minimum_size = Vector2(900, 1800)
+offset_right = 900.0
+offset_bottom = 1800.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_i5imn")
+
+[node name="MyWireBox" parent="InGameUI" instance=ExtResource("3_xhlj5")]
+layout_mode = 0
+offset_left = 232.0
+offset_top = 1663.0
+offset_right = 232.0
+offset_bottom = 1663.0
+
+[node name="RoleCon" type="VBoxContainer" parent="InGameUI"]
+layout_mode = 0
+offset_right = 189.0
+offset_bottom = 159.0
+
+[node name="TextureRect" type="TextureRect" parent="InGameUI/RoleCon"]
+layout_mode = 2
+texture = ExtResource("6_ae8ts")
+stretch_mode = 3
+
+[node name="RoleLabel" type="Label" parent="InGameUI/RoleCon"]
+layout_mode = 2
+text = "Good Guy"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="InGameUI"]
+custom_minimum_size = Vector2(810, 1200)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.45
+anchor_right = 0.5
+anchor_bottom = 0.45
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerCardGrid" type="GridContainer" parent="InGameUI/ScrollContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+columns = 2
+
+[node name="History" parent="InGameUI" instance=ExtResource("8_me2h0")]
+layout_mode = 1
+
+[node name="ClaimUI" parent="InGameUI" instance=ExtResource("4_aacon")]
+layout_mode = 2
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 565.0
+offset_top = 1509.0
+offset_right = 865.0
+offset_bottom = 1709.0
+size_flags_horizontal = 8
+size_flags_vertical = 8
+
+[node name="DeclareWindow" parent="InGameUI" instance=ExtResource("6_wjk8f")]
+visible = false
+layout_mode = 1
+
+[node name="TheirWireBox" parent="InGameUI" instance=ExtResource("3_xhlj5")]
+layout_mode = 0
+offset_left = 450.0
+offset_top = 700.0
+offset_right = 450.0
+offset_bottom = 700.0
+
+[node name="RoundRecap" parent="InGameUI" instance=ExtResource("12_ab8y5")]
+visible = false
+layout_mode = 1
+
+[node name="GameInfoCon" type="VBoxContainer" parent="InGameUI"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -167.0
+offset_right = 167.0
+offset_bottom = 114.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="RoundNumber" parent="InGameUI/GameInfoCon" instance=ExtResource("4_okqro")]
+layout_mode = 2
+
+[node name="RemainDefuseCon" type="HBoxContainer" parent="InGameUI/GameInfoCon"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="InGameUI/GameInfoCon/RemainDefuseCon"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.866667, 0, 1)
+theme_override_font_sizes/font_size = 25
+text = "Remaining Defuse wire: "
+
+[node name="Number" type="Label" parent="InGameUI/GameInfoCon/RemainDefuseCon"]
+layout_mode = 2
+text = "8"
+
+[node name="PausePanel" type="PanelContainer" parent="InGameUI"]
+visible = false
+custom_minimum_size = Vector2(900, 1800)
+layout_mode = 2
+
+[node name="PauseLabel" type="Label" parent="InGameUI/PausePanel"]
+custom_minimum_size = Vector2(800, 1600)
+layout_mode = 2
+size_flags_vertical = 6
+theme = ExtResource("5_focx7")
+text = "has disconnected.
+Waiting for player to reconnect..."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ExplodePanel" parent="." instance=ExtResource("7_oq2x6")]
+visible = false
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 900.0
+offset_bottom = 1800.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="EndingPanel" parent="." instance=ExtResource("9_b7fki")]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+
+[connection signal="join_game" from="NetworkContainer" to="." method="_on_join_game"]
+[connection signal="on_reconnect" from="NetworkContainer" to="." method="_on_network_container_on_reconnect"]
+[connection signal="set_player_name" from="NetworkContainer" to="." method="_on_network_container_set_player_name"]
+[connection signal="start_game" from="NetworkContainer" to="." method="_on_network_container_start_game"]
+[connection signal="declare_pressed" from="InGameUI/ClaimUI" to="." method="_on_claim_ui_declare_pressed"]
+[connection signal="have_bomb_presssed" from="InGameUI/ClaimUI" to="." method="_on_claim_ui_have_bomb_presssed"]
+[connection signal="spinbox_value_change" from="InGameUI/DeclareWindow" to="." method="_on_declare_window_spinbox_value_change"]
+[connection signal="exit_box" from="InGameUI/TheirWireBox" to="." method="_on_their_wire_box_exit_box"]
+[connection signal="wire_cut" from="InGameUI/TheirWireBox" to="." method="_on_their_wire_box_wire_cut"]
+[connection signal="animation_finished" from="ExplodePanel" to="." method="_on_explode_panel_animation_finished"]
+[connection signal="restart" from="EndingPanel" to="." method="_on_ending_panel_restart"]

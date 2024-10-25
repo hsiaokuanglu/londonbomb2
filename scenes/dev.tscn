@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://n0wb0llqjis4"]
+
+[ext_resource type="PackedScene" uid="uid://cbpueawmxyb1q" path="res://scenes/wire_box.tscn" id="1_t6v2d"]
+
+[node name="Node" type="Node"]
+
+[node name="Panel" type="Panel" parent="."]
+offset_right = 900.0
+offset_bottom = 1800.0
+mouse_filter = 2
+
+[node name="WireBox" parent="Panel" instance=ExtResource("1_t6v2d")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2

@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://dl43d0qttfwje"]
+
+[ext_resource type="Script" path="res://scripts/server.gd" id="1_k8h5i"]
+
+[node name="Server" type="Node"]
+script = ExtResource("1_k8h5i")
+
+[node name="Dev" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -62.0
+offset_right = 62.0
+offset_bottom = 55.0
+grow_horizontal = 2
+text = "Server"
+horizontal_alignment = 1
+
+[node name="RecapTimer" type="Timer" parent="."]
+wait_time = 10.1
+one_shot = true
+
+[connection signal="timeout" from="RecapTimer" to="." method="_on_recap_timer_timeout"]

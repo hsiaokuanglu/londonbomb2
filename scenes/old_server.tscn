@@ -1,0 +1,387 @@
+[gd_scene load_steps=4 format=3 uid="uid://056gsmad8fju"]
+
+[ext_resource type="Theme" uid="uid://dss4hlpng3bfh" path="res://theme/default.tres" id="2_rryri"]
+[ext_resource type="Texture2D" uid="uid://b2ifsjjpape8a" path="res://art/role_pic/bad_guy.png" id="4_b114b"]
+[ext_resource type="PackedScene" uid="uid://bk15ap3u2cei8" path="res://scenes/declare_window.tscn" id="5_1ko3c"]
+
+[node name="Server" type="Node"]
+
+[node name="DeclareWindow" parent="." instance=ExtResource("5_1ko3c")]
+visible = false
+
+[node name="NetworkContainer" type="VBoxContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -400.0
+offset_right = 250.0
+offset_bottom = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("2_rryri")
+
+[node name="Join" type="Button" parent="NetworkContainer"]
+custom_minimum_size = Vector2(160, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Join"
+
+[node name="SettingsContainer" type="VBoxContainer" parent="NetworkContainer"]
+visible = false
+layout_mode = 2
+
+[node name="SettingsLabel" type="Label" parent="NetworkContainer/SettingsContainer"]
+layout_mode = 2
+text = "Enter a name:"
+horizontal_alignment = 1
+
+[node name="NameCon" type="HBoxContainer" parent="NetworkContainer/SettingsContainer"]
+layout_mode = 2
+
+[node name="EnterName" type="LineEdit" parent="NetworkContainer/SettingsContainer/NameCon"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Name"
+
+[node name="SettingsApplyButton" type="Button" parent="NetworkContainer/SettingsContainer/NameCon"]
+layout_mode = 2
+text = "Enter"
+
+[node name="LobbyContainer" type="VBoxContainer" parent="NetworkContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NetworkLabel" type="Label" parent="NetworkContainer/LobbyContainer"]
+layout_mode = 2
+text = "Joined Players"
+horizontal_alignment = 1
+
+[node name="PlayerList" type="ItemList" parent="NetworkContainer/LobbyContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+item_count = 2
+
+[node name="StartButton" type="Button" parent="NetworkContainer/LobbyContainer"]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+text = "Start"
+
+[node name="Label" type="Label" parent="NetworkContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+
+[node name="Host" type="Button" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -169.0
+offset_bottom = 78.0
+grow_horizontal = 0
+size_flags_horizontal = 8
+text = "Host (Debug)"
+
+[node name="RolePic" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(50, 50)
+texture = ExtResource("4_b114b")
+
+[node name="RoleLabel" type="Label" parent="."]
+offset_top = 100.0
+offset_right = 103.0
+offset_bottom = 155.0
+theme = ExtResource("2_rryri")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+visible = false
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.13
+anchor_right = 0.95
+anchor_bottom = 0.8
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerGrid" type="GridContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_stretch_ratio = 0.0
+columns = 2
+
+[node name="HandCon" type="VBoxContainer" parent="."]
+visible = false
+offset_left = 3.00002
+offset_top = 998.0
+offset_right = 202.0
+offset_bottom = 1247.0
+scale = Vector2(0.840002, 0.8)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="HandCon"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "My Wires"
+horizontal_alignment = 1
+
+[node name="Hand" type="ItemList" parent="HandCon"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ClaimUI" type="VBoxContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(300, 200)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -201.0
+offset_top = -200.0
+offset_right = -1.0
+grow_horizontal = 0
+grow_vertical = 0
+theme = ExtResource("2_rryri")
+
+[node name="DefuseWireContainer" type="HBoxContainer" parent="ClaimUI"]
+visible = false
+layout_mode = 2
+alignment = 2
+
+[node name="Label" type="Label" parent="ClaimUI/DefuseWireContainer"]
+layout_mode = 2
+text = "Defuse Wire:"
+
+[node name="MenuButton" type="MenuButton" parent="ClaimUI/DefuseWireContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="BombContainer" type="HBoxContainer" parent="ClaimUI"]
+visible = false
+layout_mode = 2
+alignment = 2
+
+[node name="Label" type="Label" parent="ClaimUI/BombContainer"]
+layout_mode = 2
+text = "Bomb:"
+
+[node name="MenuButton" type="MenuButton" parent="ClaimUI/BombContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="Button" type="Button" parent="ClaimUI"]
+layout_mode = 2
+text = "Declare!"
+
+[node name="HaveBombButton" type="Button" parent="ClaimUI"]
+layout_mode = 2
+toggle_mode = true
+text = "No Bomb"
+
+[node name="HistoryCon" type="VBoxContainer" parent="."]
+visible = false
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 351.0
+offset_top = -352.0
+offset_right = 601.0
+offset_bottom = -2.0
+grow_vertical = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label2" type="Label" parent="HistoryCon"]
+layout_mode = 2
+text = "History"
+horizontal_alignment = 1
+
+[node name="History" type="ItemList" parent="HistoryCon"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="WireBoxWindow" type="Window" parent="."]
+initial_position = 1
+size = Vector2i(300, 700)
+visible = false
+borderless = true
+theme = ExtResource("2_rryri")
+
+[node name="background" type="Sprite2D" parent="WireBoxWindow"]
+scale = Vector2(6, 15)
+
+[node name="ExitButton" type="Button" parent="WireBoxWindow"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -39.5
+offset_top = -63.0
+offset_right = 39.5
+grow_horizontal = 2
+grow_vertical = 0
+text = "Exit"
+
+[node name="OthersWireBox" parent="."]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+visible = false
+position = Vector2(384, 690)
+script = null
+
+[node name="MyWireBox" parent="."]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+visible = false
+position = Vector2(249, 1463)
+script = null
+
+[node name="RoundCon" type="HBoxContainer" parent="."]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -154.5
+offset_right = 154.5
+offset_bottom = 55.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("2_rryri")
+
+[node name="RoundTimer" type="Timer" parent="RoundCon"]
+
+[node name="CountdownText" type="Label" parent="RoundCon"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Countdown:"
+uppercase = true
+
+[node name="CountdownNum" type="Label" parent="RoundCon"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "4"
+
+[node name="DefuseWireCon" type="HBoxContainer" parent="."]
+visible = false
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.04
+anchor_right = 0.5
+anchor_bottom = 0.04
+offset_left = -165.5
+offset_right = 165.5
+offset_bottom = 55.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="DefuseWireCon"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Remaining Defused Wire:"
+
+[node name="Number" type="Label" parent="DefuseWireCon"]
+layout_mode = 2
+theme = ExtResource("2_rryri")
+theme_override_colors/font_color = Color(1, 0.94902, 0, 1)
+text = "1"
+
+[node name="Results" type="VBoxContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(150, 0)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -75.0
+offset_top = -61.5
+offset_right = 75.0
+offset_bottom = 61.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="DefuseSprite" type="Sprite2D" parent="Results"]
+visible = false
+position = Vector2(75, -350)
+scale = Vector2(0.6, 0.6)
+
+[node name="ExplodeAnimation" parent="Results"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+visible = false
+position = Vector2(75, 75)
+script = null
+
+[node name="Label" type="Label" parent="Results"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Win"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="Results"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Restart"
+
+[node name="Button" type="Button" parent="Results"]
+visible = false
+layout_mode = 2
+text = "Debug"
+
+[node name="PausePanel" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(800, 1600)
+offset_top = 4.0
+offset_right = 800.0
+offset_bottom = 1604.0
+
+[node name="PauseLabel" type="Label" parent="PausePanel"]
+custom_minimum_size = Vector2(800, 1600)
+layout_mode = 2
+size_flags_vertical = 6
+theme = ExtResource("2_rryri")
+text = "has disconnected.
+Waiting for player to reconnect..."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[connection signal="declare_exit_press" from="DeclareWindow" to="." method="_on_declare_button_pressed"]
+[connection signal="spinbox_value_change" from="DeclareWindow" to="." method="_on_declare_window_spinbox_value_change"]
+[connection signal="pressed" from="NetworkContainer/Join" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="NetworkContainer/SettingsContainer/NameCon/SettingsApplyButton" to="." method="_on_settings_apply_button_pressed"]
+[connection signal="pressed" from="NetworkContainer/LobbyContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="Host" to="." method="_start_server"]
+[connection signal="pressed" from="ClaimUI/Button" to="." method="_on_declare_button_pressed"]
+[connection signal="pressed" from="ClaimUI/HaveBombButton" to="." method="_on_have_bomb_button_pressed"]
+[connection signal="pressed" from="WireBoxWindow/ExitButton" to="." method="_on_wire_box_exit_button_pressed"]
+[connection signal="pressed" from="Results/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="Results/Button" to="." method="play_explosion"]

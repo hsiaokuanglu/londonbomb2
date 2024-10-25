@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=3 uid="uid://ptp1audfchxn"]
+
+[ext_resource type="Script" path="res://scripts/round_number.gd" id="1_20wra"]
+
+[node name="RoundNumber" type="HBoxContainer"]
+alignment = 1
+script = ExtResource("1_20wra")
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 2
+text = "COUNTDOWN:"
+
+[node name="gap" type="Label" parent="."]
+layout_mode = 2
+text = "  "
+
+[node name="Number" type="Label" parent="."]
+layout_mode = 2
+text = "4"
+
+[node name="Decimal" type="Label" parent="."]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = ":59:99"
+
+[node name="RecapTimer" type="Timer" parent="."]
+wait_time = 10.0
+one_shot = true
+
+[node name="RoundTimer" type="Timer" parent="."]
+wait_time = 59.0
+autostart = true
+
+[connection signal="timeout" from="RecapTimer" to="." method="_on_recap_timer_timeout"]

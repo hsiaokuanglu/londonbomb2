@@ -1,0 +1,82 @@
+[gd_scene load_steps=3 format=3 uid="uid://dml3pjnytvphd"]
+
+[ext_resource type="Theme" uid="uid://dss4hlpng3bfh" path="res://theme/default.tres" id="1_mthw8"]
+[ext_resource type="Script" path="res://scripts/network_container.gd" id="2_5cqbp"]
+
+[node name="NetworkContainer" type="VBoxContainer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -400.0
+offset_right = 250.0
+offset_bottom = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_mthw8")
+script = ExtResource("2_5cqbp")
+
+[node name="Join" type="Button" parent="."]
+custom_minimum_size = Vector2(160, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Join"
+
+[node name="SettingsContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="SettingsLabel" type="Label" parent="SettingsContainer"]
+layout_mode = 2
+text = "Enter a name:"
+horizontal_alignment = 1
+
+[node name="NameCon" type="HBoxContainer" parent="SettingsContainer"]
+layout_mode = 2
+
+[node name="EnterName" type="LineEdit" parent="SettingsContainer/NameCon"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Name"
+
+[node name="NameEnterButton" type="Button" parent="SettingsContainer/NameCon"]
+layout_mode = 2
+text = "Enter"
+
+[node name="LobbyContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NetworkLabel" type="Label" parent="LobbyContainer"]
+layout_mode = 2
+text = "Joined Players:"
+horizontal_alignment = 1
+
+[node name="PlayerList" type="ItemList" parent="LobbyContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+item_count = 2
+
+[node name="StartButton" type="Button" parent="LobbyContainer"]
+visible = false
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+text = "Start"
+
+[node name="ConnectionStatusLabel" type="Label" parent="."]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+
+[node name="ReconnectButton" type="Button" parent="."]
+visible = false
+layout_mode = 2
+text = "Reconnect"
+
+[connection signal="pressed" from="Join" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="SettingsContainer/NameCon/NameEnterButton" to="." method="_on_name_enter_button_pressed"]
+[connection signal="pressed" from="LobbyContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="ReconnectButton" to="." method="_on_reconnect_button_pressed"]

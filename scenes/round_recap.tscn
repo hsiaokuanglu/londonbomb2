@@ -1,0 +1,43 @@
+[gd_scene load_steps=2 format=3 uid="uid://cda30asktagbr"]
+
+[ext_resource type="Script" path="res://scripts/round_recap.gd" id="1_pucuc"]
+
+[node name="RoundRecap" type="Panel" node_paths=PackedStringArray("tree")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_pucuc")
+tree = NodePath("CenterContainer/VBoxContainer/Tree")
+
+[node name="CenterContainer" type="Panel" parent="."]
+custom_minimum_size = Vector2(800, 1600)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -1600.0
+offset_right = 400.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+offset_right = 800.0
+offset_bottom = 1600.0
+
+[node name="Title" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Round Recap"
+horizontal_alignment = 1
+
+[node name="Tree" type="Tree" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+hide_root = true

@@ -46,6 +46,7 @@ scale = Vector2(0.79, 0.79)
 texture = ExtResource("4_4s3bd")
 
 [node name="ExitButton" type="Button" parent="."]
+layout_mode = 0
 offset_left = -65.0
 offset_top = 280.0
 offset_right = 65.0
@@ -70,6 +71,7 @@ horizontal_alignment = 1
 
 [node name="Button" type="Button" parent="."]
 visible = false
+layout_mode = 0
 offset_left = 175.0
 offset_top = -455.0
 offset_right = 336.0

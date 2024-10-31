@@ -2,33 +2,49 @@
 
 [ext_resource type="Script" path="res://scripts/round_number.gd" id="1_20wra"]
 
-[node name="RoundNumber" type="HBoxContainer"]
+[node name="RoundNumber" type="VBoxContainer" node_paths=PackedStringArray("recap_timer", "round_timer")]
+offset_right = 395.0
+offset_bottom = 84.0
+size_flags_horizontal = 4
+size_flags_vertical = 0
 alignment = 1
 script = ExtResource("1_20wra")
+recap_timer = NodePath("RecapTimer")
+round_timer = NodePath("RoundTimer")
 
-[node name="Title" type="Label" parent="."]
+[node name="RoundTimerBar" type="ProgressBar" parent="."]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+max_value = 60.0
+value = 60.0
+show_percentage = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="HBoxContainer"]
 layout_mode = 2
 text = "COUNTDOWN:"
 
-[node name="gap" type="Label" parent="."]
+[node name="gap" type="Label" parent="HBoxContainer"]
 layout_mode = 2
 text = "  "
 
-[node name="Number" type="Label" parent="."]
+[node name="Number" type="Label" parent="HBoxContainer"]
 layout_mode = 2
 text = "4"
 
-[node name="Decimal" type="Label" parent="."]
+[node name="Decimal" type="Label" parent="HBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = ":59:99"
+
+[node name="RoundTimer" type="Timer" parent="."]
+wait_time = 60.0
 
 [node name="RecapTimer" type="Timer" parent="."]
 wait_time = 10.0
 one_shot = true
 
-[node name="RoundTimer" type="Timer" parent="."]
-wait_time = 59.0
-autostart = true
-
+[connection signal="timeout" from="RoundTimer" to="." method="_on_round_timer_timeout"]
 [connection signal="timeout" from="RecapTimer" to="." method="_on_recap_timer_timeout"]

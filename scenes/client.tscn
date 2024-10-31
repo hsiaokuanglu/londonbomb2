@@ -32,10 +32,10 @@ ending_panel = NodePath("EndingPanel")
 round_recap = NodePath("InGameUI/RoundRecap")
 
 [node name="NetworkContainer" parent="." instance=ExtResource("2_qrcjs")]
+visible = false
 metadata/_edit_use_anchors_ = true
 
 [node name="InGameUI" type="Panel" parent="."]
-visible = false
 custom_minimum_size = Vector2(900, 1800)
 offset_right = 900.0
 offset_bottom = 1800.0
@@ -64,7 +64,7 @@ layout_mode = 2
 text = "Good Guy"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="InGameUI"]
-custom_minimum_size = Vector2(810, 1200)
+custom_minimum_size = Vector2(810, 1210)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -81,12 +81,9 @@ grow_vertical = 2
 [node name="PlayerCardGrid" type="GridContainer" parent="InGameUI/ScrollContainer"]
 clip_contents = true
 layout_mode = 2
-size_flags_horizontal = 6
-size_flags_vertical = 6
+size_flags_horizontal = 4
+size_flags_vertical = 4
 columns = 2
-
-[node name="History" parent="InGameUI" instance=ExtResource("8_me2h0")]
-layout_mode = 1
 
 [node name="ClaimUI" parent="InGameUI" instance=ExtResource("4_aacon")]
 layout_mode = 2
@@ -115,6 +112,9 @@ offset_bottom = 700.0
 
 [node name="RoundRecap" parent="InGameUI" instance=ExtResource("12_ab8y5")]
 visible = false
+layout_mode = 1
+
+[node name="History" parent="InGameUI" instance=ExtResource("8_me2h0")]
 layout_mode = 1
 
 [node name="GameInfoCon" type="VBoxContainer" parent="InGameUI"]

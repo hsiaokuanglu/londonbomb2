@@ -24,6 +24,9 @@ offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Result" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+
 [node name="WoLLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 text = "Win"

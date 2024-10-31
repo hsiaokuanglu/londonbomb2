@@ -11,7 +11,10 @@ var bomb_type = "bomb"
 # wire_results
 const BOMB_DEFUSED = "bomb_defused"
 const BOMB_EXPLODES = "bomb_explodes"
+var server: Variant
 
+func set_server(_server):
+	server = _server
 
 func next_round():
 	# get dead wires
@@ -121,7 +124,12 @@ func update_cut_history(cutter_id: int, being_cut_id: int, wire_type: String):
 	})
 	game_data.history[cur_round][cutter_name] = cut_hist
 
-func cut_wire_logic(wire_type: String):
+func cut_wire_logic(cutter_id: int, being_cut_id:int, wire_id: int):
+	game_data.player_finished_cut[cutter_id] = true
+	var wire = game_data["player_wire_boxes"][being_cut_id][wire_id]
+	game_data["player_wire_boxes"][being_cut_id][wire_id]["is_cut"] = true
+	var wire_type = wire["type"]
+	update_cut_history(cutter_id, being_cut_id, wire_type)
 	if wire_type == bomb_type:
 		return BOMB_EXPLODES
 	elif wire_type == defuse_type:
@@ -132,9 +140,26 @@ func cut_wire_logic(wire_type: String):
 		#return ""
 	return ""
 
-
 func check_next_round():
+	# check if all players have cut
 	var all_fin_cut = true
 	for fin_cut in game_data.player_finished_cut.values():
 		all_fin_cut = all_fin_cut and fin_cut
 	return all_fin_cut
+
+
+
+func timer_timeout_random_cut():
+
+	var players = game_data.get_non_cut_players()
+	players.shuffle()
+	var uncut_wires = game_data.get_uncut_wires()
+	uncut_wires.shuffle()
+	for i in range(players.size()):
+		#cutter_id: int, being_cut_id:int, wire_id: int
+		var being_cut_id = uncut_wires[i]["being_cut_id"]
+		var wire_id = uncut_wires[i]["wire_id"]
+		print("cutter: " , str(players[i]),
+			", being_cut: ", str(being_cut_id),
+			", wire_type: ", str(game_data.player_wire_boxes[being_cut_id][wire_id]["type"]))
+		server.cut_wire(players[i], being_cut_id, wire_id)

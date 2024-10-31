@@ -2,7 +2,8 @@ extends Control
 
 var client_id:int
 signal check_wire(client_id: int)
-
+@onready
+var have_bomb_label = $VBoxContainer/ClaimUI/BombCon/HaveBomb
 #func _ready():
 	#dev()
 
@@ -44,9 +45,11 @@ func cut_player_card_wire(wire_id: int):
 
 func set_have_bomb_claim(claim: bool):
 	if claim:
-		$VBoxContainer/ClaimUI/BombCon/HaveBomb.text = "I have bomb"
+		have_bomb_label.set_text("I have bomb")
+		have_bomb_label.add_theme_color_override("font_color", Color("red"))
 	else:
-		$VBoxContainer/ClaimUI/BombCon/HaveBomb.text = "No bomb"
+		have_bomb_label.set_text("No bomb")
+		have_bomb_label.add_theme_color_override("font_color", Color("white"))
 
 func set_defuse_claim(claim: int):
 	$VBoxContainer/ClaimUI/DWireCon/Count.text = str(claim)

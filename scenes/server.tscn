@@ -2,8 +2,11 @@
 
 [ext_resource type="Script" path="res://scripts/server.gd" id="1_k8h5i"]
 
-[node name="Server" type="Node"]
+[node name="Server" type="Node" node_paths=PackedStringArray("delay_timer", "last_cut_timer", "defuse_timer")]
 script = ExtResource("1_k8h5i")
+delay_timer = NodePath("BombDelayTimer")
+last_cut_timer = NodePath("LastCutTimer")
+defuse_timer = NodePath("DefuseDelayTimer")
 
 [node name="Dev" type="Label" parent="."]
 anchors_preset = 5
@@ -17,7 +20,23 @@ text = "Server"
 horizontal_alignment = 1
 
 [node name="RecapTimer" type="Timer" parent="."]
-wait_time = 10.1
+wait_time = 10.05
+one_shot = true
+
+[node name="RoundTimer" type="Timer" parent="."]
+wait_time = 60.0
+
+[node name="BombDelayTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="LastCutTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="DefuseDelayTimer" type="Timer" parent="."]
 one_shot = true
 
 [connection signal="timeout" from="RecapTimer" to="." method="_on_recap_timer_timeout"]
+[connection signal="timeout" from="RoundTimer" to="." method="_on_round_timer_timeout"]
+[connection signal="timeout" from="BombDelayTimer" to="." method="_on_bomb_delay_timer_timeout"]
+[connection signal="timeout" from="LastCutTimer" to="." method="_on_last_cut_timer_timeout"]
+[connection signal="timeout" from="DefuseDelayTimer" to="." method="_on_defuse_delay_timer_timeout"]

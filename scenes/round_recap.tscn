@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/round_recap.gd" id="1_pucuc"]
 
-[node name="RoundRecap" type="Panel" node_paths=PackedStringArray("tree")]
+[node name="RoundRecap" type="Panel" node_paths=PackedStringArray("tree", "timer_bar")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -10,6 +10,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_pucuc")
 tree = NodePath("CenterContainer/VBoxContainer/Tree")
+timer_bar = NodePath("CenterContainer/VBoxContainer/TimerBar")
 
 [node name="CenterContainer" type="Panel" parent="."]
 custom_minimum_size = Vector2(800, 1600)
@@ -36,6 +37,13 @@ offset_bottom = 1600.0
 layout_mode = 2
 text = "Round Recap"
 horizontal_alignment = 1
+
+[node name="TimerBar" type="ProgressBar" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+max_value = 10.0
+value = 10.0
+show_percentage = false
 
 [node name="Tree" type="Tree" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2

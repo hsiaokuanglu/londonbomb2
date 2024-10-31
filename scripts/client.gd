@@ -1,16 +1,13 @@
 extends Node
 
 var multiplayer_peer = WebSocketMultiplayerPeer.new()
-var debug = false
+var debug = true
 var url = "wss://luraykuang1998.online:443"
 var url_dev = "ws://localhost:8765"
 #
 var my_net_id: int
 var player_cards: Dictionary
 var finished_cut: bool
-#
-var role_name_good = "Good Guy"
-var role_name_bad = "Bad Guy"
 #
 @export
 var pause_panel: PanelContainer
@@ -25,7 +22,7 @@ var in_game_ui: Panel
 @export
 var role_texture: TextureRect
 @export
-var round_number: HBoxContainer
+var round_number: VBoxContainer
 @export
 var remaining_defuse_label: Label
 @export
@@ -54,20 +51,6 @@ func dev_join(_p_name: String):
 	network_ui._on_join_pressed()
 	#network_ui.dev_set_name(p_name)
 
-func _on_join_game() -> void:
-	var err
-	if debug == true:
-		err = multiplayer_peer.create_client(url_dev) 
-	else:
-		err = multiplayer_peer.create_client(url, TLSOptions.client())
-	if err == OK:
-		print("Connecting to WebSocket server...")
-		multiplayer.multiplayer_peer = multiplayer_peer
-		my_net_id = multiplayer.get_unique_id()
-		network_ui.set_multiplayer_authority(my_net_id)
-		multiplayer.connected_to_server.connect(_on_connection_established)	
-		multiplayer.connection_failed.connect(_on_connection_error)	
-
 func _on_connection_established():
 	my_net_id = multiplayer.get_unique_id()
 	print("Connected to server")
@@ -81,22 +64,13 @@ func _on_connection_error():
 	print("Connection error")
 	network_ui.set_connection_status_str("Connection error")
 
-
-# send to server
-func _on_network_container_set_player_name(p_name: String) -> void:
-	rpc_id(1, "set_player_name", 
-		Dictionary({"my_net_id": my_net_id, "new_name": p_name}))
-
-func _on_network_container_start_game() -> void:
-	rpc_id(1, "start_game")
-
 func set_role_icon(role: String):
-	if role == role_name_good:
+	if role == GameLogic.ROLE_GOOD:
 		role_texture.set_texture(load("res://art/role_pic/good_guy.png"))
-		$InGameUI/RoleCon/RoleLabel.text = role_name_good
-	else:
+		$InGameUI/RoleCon/RoleLabel.text = GameLogic.ROLE_GOOD
+	elif role == GameLogic.ROLE_BAD:
 		role_texture.set_texture(load("res://art/role_pic/bad_guy.png"))
-		$InGameUI/RoleCon/RoleLabel.text = role_name_bad
+		$InGameUI/RoleCon/RoleLabel.text = GameLogic.ROLE_BAD
 
 func set_round_number(round_n: int):
 	round_number.set_round_number(round_n)
@@ -104,51 +78,8 @@ func set_round_number(round_n: int):
 func set_remaining_defuse_number(defuse_n: int):
 	remaining_defuse_label.text = str(defuse_n)
 
-@rpc
-func bomb_defused_client(is_winner: bool):
-	in_game_ui.hide()
-	
-	ending_panel.set_win_or_lose(is_winner)
-	ending_panel.show()
-
-
-@rpc
-func bomb_explode_client(is_winner: bool):
-	ending_panel.set_win_or_lose(is_winner)
-
-	in_game_ui.hide()
-	#
-	explode_panel.play_animation()
-
-@rpc
-func show_recap(game_data: Dictionary):
-	round_recap.show()
-	round_recap.set_history(game_data["history"])
-	round_number.start_recap()
-
-func _on_explode_panel_animation_finished() -> void:
-	explode_panel.hide()
-	ending_panel.show()
-
-@rpc("authority")
-func client_start_game(game_data: Dictionary):
-	clear_player_card()
-	in_game_ui.show()
-	explode_panel.hide()
-	ending_panel.hide()
-	player_card_grid_ui.show()
-	their_wire_box_ui.hide()
-	# reset history
-	update_history(game_data["history"])
-	# set role
-	set_role_icon(game_data["player_id_role"][my_net_id])
-	# set round number
-	set_round_number(game_data["current_round"])
-	# set remaining defuse wire count
-	set_remaining_defuse_number(game_data["remaining_defuse_wire"])
-	# set wire box
-	my_wire_box.set_my_box(my_net_id, game_data["player_wire_boxes"][my_net_id])
-	# player card grid
+# set player grid
+func _set_player_grid(game_data: Dictionary):
 	player_cards = Dictionary()
 	for their_id in game_data["player_id_name"].keys():
 		var player_card = preload("res://scenes/player_card.tscn").instantiate()
@@ -165,18 +96,6 @@ func client_start_game(game_data: Dictionary):
 		if their_id == my_net_id:
 			player_card.disable_check_button()
 		player_card_grid_ui.add_child(player_card)
-	
-
-	# set defuse claim
-	for id in game_data["player_defuse_claim"].keys():
-		update_defuse_claim(id, game_data["player_defuse_claim"][id])
-	# set declare window spinbox number
-	declare_window.reconnect_set_defuse_num(game_data["player_defuse_claim"][my_net_id])
-	# set have bomb claim
-	for id in game_data["player_have_bomb_claim"].keys():
-		update_bomb_claim(id, game_data["player_have_bomb_claim"][id])
-
-	show_in_game()
 
 func clear_player_card():
 	player_cards.clear()
@@ -188,8 +107,37 @@ func show_in_game():
 	network_ui.hide()
 	in_game_ui.show()
 
+
+# callback events
+
+# send to server
+func _on_network_container_set_player_name(p_name: String) -> void:
+	rpc_id(1, "set_player_name", 
+		Dictionary({"my_net_id": my_net_id, "new_name": p_name}))
+
+func _on_network_container_start_game() -> void:
+	rpc_id(1, "start_game")
+
 func _on_check_wire_pressed(their_id: int):
 	rpc_id(1, "request_wire_box", my_net_id, their_id)
+
+func _on_explode_panel_animation_finished() -> void:
+	explode_panel.hide()
+	ending_panel.show()
+
+func _on_join_game() -> void:
+	var err
+	if debug == true:
+		err = multiplayer_peer.create_client(url_dev) 
+	else:
+		err = multiplayer_peer.create_client(url, TLSOptions.client())
+	if err == OK:
+		print("Connecting to WebSocket server...")
+		multiplayer.multiplayer_peer = multiplayer_peer
+		my_net_id = multiplayer.get_unique_id()
+		network_ui.set_multiplayer_authority(my_net_id)
+		multiplayer.connected_to_server.connect(_on_connection_established)	
+		multiplayer.connection_failed.connect(_on_connection_error)	
 
 func _on_their_wire_box_wire_cut(wire_data: Dictionary) -> void:
 	rpc_id(1, "cut_wire",
@@ -213,6 +161,71 @@ func _on_declare_window_spinbox_value_change(value: int) -> void:
 func _on_claim_ui_have_bomb_presssed() -> void:
 	rpc_id(1, "have_bomb_pressed", my_net_id)
 
+func _on_network_container_on_reconnect(p_name: String) -> void:
+	var my_id = multiplayer.get_unique_id()
+	rpc_id(1,
+		"request_reconnect",
+		my_id,
+		p_name)
+
+@rpc
+func round_timer_timeout(game_data: Dictionary):
+	pass
+
+@rpc
+func bomb_defused_client(is_winner: bool):
+	in_game_ui.hide()
+	ending_panel.set_win_or_lose(is_winner)
+	ending_panel.set_result(GameLogic.BOMB_DEFUSED)
+	ending_panel.show()
+
+@rpc
+func bomb_explode_client(is_winner: bool):
+	in_game_ui.hide()
+	ending_panel.set_win_or_lose(is_winner)
+	ending_panel.set_result(GameLogic.BOMB_EXPLODES)
+	#
+	explode_panel.play_animation()
+
+@rpc
+func show_recap(game_data: Dictionary):
+	round_recap.show()
+	round_recap.set_history(game_data["history"])
+	round_recap.start_timer_bar()
+	round_number.start_recap()
+
+@rpc("authority")
+func client_start_game(game_data: Dictionary):
+	clear_player_card()
+	in_game_ui.show()
+	explode_panel.hide()
+	ending_panel.hide()
+	player_card_grid_ui.show()
+	their_wire_box_ui.hide()
+	# reset history
+	update_history(game_data["history"])
+	# set role
+	set_role_icon(game_data["player_id_role"][my_net_id])
+	# set round number
+	set_round_number(game_data["current_round"])
+	# set remaining defuse wire count
+	set_remaining_defuse_number(game_data["remaining_defuse_wire"])
+	# set wire box
+	my_wire_box.set_my_box(my_net_id, game_data["player_wire_boxes"][my_net_id])
+	# player card grid
+	_set_player_grid(game_data)
+	# set defuse claim
+	for id in game_data["player_defuse_claim"].keys():
+		update_defuse_claim(id, game_data["player_defuse_claim"][id])
+	# set declare window spinbox number
+	declare_window.reconnect_set_defuse_num(game_data["player_defuse_claim"][my_net_id])
+	# set have bomb claim
+	for id in game_data["player_have_bomb_claim"].keys():
+		update_bomb_claim(id, game_data["player_have_bomb_claim"][id])
+
+	show_in_game()
+	round_number.start_round_countdown()
+
 @rpc
 func update_history(history: Dictionary):
 	$InGameUI/History.set_history(history)
@@ -225,8 +238,6 @@ func update_cut_wire(cutter_id: int, client_id: int, wire_id: int, remain_defuse
 	if their_wire_box_ui.is_visible():
 		if client_id == their_wire_box_ui.cur_player_id:
 			their_wire_box_ui.update_cut_wire(wire_id)
-	
-
 
 @rpc
 func update_my_wire_cut(wire_type: String):
@@ -241,6 +252,7 @@ func show_wire_box(their_id: int, their_name: String, their_wire_box: Dictionary
 
 @rpc
 func next_round(game_data: Dictionary):
+	round_number.start_round_countdown()
 	round_recap.hide()
 	#_round_recap_timer(game_data)
 	# reset finished cut
@@ -251,7 +263,6 @@ func next_round(game_data: Dictionary):
 		p_card.set_player_card_wire(game_data["player_wire_boxes"][p_card.client_id])
 		#p_card.set_defuse_claim(0)
 	declare_window._set_spinbox_value(0)
-
 
 	their_wire_box_ui.hide()
 	player_card_grid_ui.show()
@@ -352,10 +363,3 @@ func restart_game():
 @rpc
 func request_reconnect(_id: int, _p_name: String):
 	pass
-
-func _on_network_container_on_reconnect(p_name: String) -> void:
-	var my_id = multiplayer.get_unique_id()
-	rpc_id(1,
-		"request_reconnect",
-		my_id,
-		p_name)

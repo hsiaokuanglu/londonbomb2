@@ -3,17 +3,30 @@ extends Node
 var multiplayer_peer = WebSocketMultiplayerPeer.new()
 var port = 8765
 var game_started = false
+var game_paused = false
 var disconnected_ids: Array
 
 # game data
 var game_logic: GameLogic
 var game_data: GameData
 
+@onready
+var round_timer = $RoundTimer
+@export
+var delay_timer: Timer
+@export
+var last_cut_timer: Timer
+@export
+var defuse_timer: Timer
+
+
 func _ready():
 	_start_server()
 
+
 func _start_server():
 	game_logic = GameLogic.new()
+	game_logic.set_server(self)
 	game_data = game_logic.game_data
 	
 	print("server mode")
@@ -36,19 +49,8 @@ func _match_disconnected_name(connected_name: String) -> int:
 
 func _on_client_connected(id):
 	if game_started:
-		# if some clients previously disconnected,
-		# reconnect the new client with the old client's game state
 		if disconnected_ids.size() > 0:
 			rpc_id(id, "show_reconnect")
-			#game_data.init_player(id)
-			#var old_id = disconnected_ids.pop_front()
-			#game_data.replace_player(old_id, id)
-			#rpc_id(id, "reconnect_game", game_data.get_data_dict())
-			#rpc_all_clients("update_reconnect_player", [old_id, id], [id])
-			#if disconnected_ids.size() == 0:
-				#rpc_all_clients("resume_game")
-			#else:
-				#rpc_id(id, "disconnect_pause", [""])
 		else:
 			rpc_id(id, "already_start")
 	else:
@@ -60,21 +62,17 @@ func _on_client_connected(id):
 
 func _on_client_disconnected(id):
 	print("Client disconnected: ", id)
-
 	if game_started:
 		disconnected_ids.append(id)
 		var names = []
 		for d_id in disconnected_ids:
 			names.append(game_data["player_id_name"][d_id])
 		rpc_all_clients("disconnect_pause", [names], disconnected_ids)
+		game_paused = true
 	else:
 		game_data.remove_player(id)
 		rpc_all_clients("update_player_name", [game_data.player_id_name.values()], [])
 		check_start_game_button()
-
-	#game_data.player_id_name.erase(id)
-
-
 
 func rpc_all_clients(method_name: String, args=[], except_ids=[]):
 	var rpc_args = []
@@ -90,6 +88,46 @@ func check_start_game_button():
 	else:
 		rpc_all_clients("update_start_game_button", [false])
 
+func _on_last_cut_timer_timeout():
+	if not game_started:
+		return
+	game_logic.next_round()
+	# start recap timer
+	rpc_all_clients("show_recap", [game_data.get_data_dict()])
+	$RecapTimer.start()
+
+func _on_recap_timer_timeout():
+	rpc_all_clients("next_round", [game_data.get_data_dict()])
+	round_timer.start()
+
+func _on_bomb_delay_timer_timeout():
+	game_started = false
+	round_timer.stop()
+	for client_id in game_data.get_ids():
+		if game_data["player_id_role"][client_id] == GameLogic.ROLE_GOOD:
+			rpc_id(client_id, "bomb_explode_client", false)
+		else:
+			rpc_id(client_id, "bomb_explode_client", true)
+
+func bomb_explodes():
+	delay_timer.start()
+
+func _on_defuse_delay_timer_timeout():
+	game_started = false
+	round_timer.stop()
+	for client_id in game_data.get_ids():
+		if game_data["player_id_role"][client_id] == GameLogic.ROLE_GOOD:
+			rpc_id(client_id, "bomb_defused_client", true)
+		else:
+			rpc_id(client_id, "bomb_defused_client", false)
+
+func bomb_defused():
+	defuse_timer.start()
+
+func _on_round_timer_timeout():
+	# TODO: clients, who have not cut, cut a random wire from others
+	game_logic.timer_timeout_random_cut()
+	rpc_all_clients("round_timer_timeout", [game_data.get_data_dict()])
 
 @rpc("any_peer")
 func set_player_name(data: Dictionary):
@@ -110,6 +148,7 @@ func start_game():
 	game_data.set_player_wire_boxes(dealt_wires)
 	# call client start game
 	rpc_all_clients("client_start_game", [game_data.get_data_dict()])
+	round_timer.start()
 
 @rpc("any_peer")
 func declare_defuse_change(defuse_num: int, client_id: int):
@@ -136,47 +175,32 @@ func request_wire_box(my_id: int, their_id: int):
 
 @rpc("any_peer")
 func cut_wire(cutter_id: int, being_cut_id:int, wire_id: int):
-	game_data["player_finished_cut"][cutter_id] = true
+	#game_data["player_finished_cut"][cutter_id] = true
 	var wire = game_data["player_wire_boxes"][being_cut_id][wire_id]
-	game_data["player_wire_boxes"][being_cut_id][wire_id]["is_cut"] = true
+	#game_data["player_wire_boxes"][being_cut_id][wire_id]["is_cut"] = true
 	
-	var wire_result = game_logic.cut_wire_logic(wire["type"])
-	game_logic.update_cut_history(cutter_id, being_cut_id, wire["type"])
+	var wire_result = game_logic.cut_wire_logic(cutter_id, being_cut_id, wire_id)
+	#game_logic.update_cut_history(cutter_id, being_cut_id, wire["type"])
 	rpc_all_clients("update_history", [game_data.history])
 	# update
 	rpc_all_clients("update_cut_wire", [cutter_id, being_cut_id, wire_id, game_data["remaining_defuse_wire"]])
 	rpc_id(being_cut_id, "update_my_wire_cut", wire["type"])
-	# check if all players have finished cut
-	if game_logic.check_next_round():
-		#TODO: add delay timer
-		print(game_data["history"])
-		game_logic.next_round()
-		# start recap timer
-		rpc_all_clients("show_recap", [game_data.get_data_dict()])
-		$RecapTimer.start()
-	if wire_result == GameLogic.BOMB_EXPLODES:
-		game_started = false
+	if wire_result == GameLogic.BOMB_EXPLODES: # if bomb explodes
 		bomb_explodes()
-	elif wire_result == GameLogic.BOMB_DEFUSED:
-		game_started = false
+	elif wire_result == GameLogic.BOMB_DEFUSED: # if bomb defused
 		bomb_defused()
+	else:
+		# check if all players have finished cut
+		if game_logic.check_next_round():
+			#print(game_data["history"])
+			#print(game_data.get_uncut_wires())
+			if not game_started and game_data.current_round == 1:
+				# ran out of round, so bomb explodes
+				bomb_explodes()
+			else:
+				last_cut_timer.start()
 
-func _on_recap_timer_timeout():
-	rpc_all_clients("next_round", [game_data.get_data_dict()])
 
-func bomb_explodes():
-	for client_id in game_data.get_ids():
-		if game_data["player_id_role"][client_id] == GameLogic.ROLE_GOOD:
-			rpc_id(client_id, "bomb_explode_client", false)
-		else:
-			rpc_id(client_id, "bomb_explode_client", true)
-
-func bomb_defused():
-	for client_id in game_data.get_ids():
-		if game_data["player_id_role"][client_id] == GameLogic.ROLE_GOOD:
-			rpc_id(client_id, "bomb_defused_client", true)
-		else:
-			rpc_id(client_id, "bomb_defused_client", false)
 
 @rpc("any_peer")
 func restart_game():
@@ -194,6 +218,7 @@ func request_reconnect(id: int, p_name: String):
 	rpc_all_clients("update_reconnect_player", [old_id, id], [id])
 	if disconnected_ids.size() == 0:
 		rpc_all_clients("resume_game")
+		game_paused = false
 	else:
 		rpc_id(id, "disconnect_pause", [""])
 
@@ -202,6 +227,9 @@ func request_reconnect(id: int, p_name: String):
 
 
 # implemented in client
+@rpc
+func round_timer_timeout(_game_data: Dictionary):
+	pass
 
 @rpc
 func update_player_name(_data: Array):

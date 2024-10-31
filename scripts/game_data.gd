@@ -19,6 +19,24 @@ var player_have_bomb_claim: Dictionary
 var player_finished_cut: Dictionary
 var history: Dictionary
 
+func get_non_cut_players() -> Array:
+	var p = []
+	for p_id in get_ids():
+		if not player_finished_cut[p_id]:
+			p.append(p_id)
+	return p
+
+func get_uncut_wires() -> Array:
+	var uncut_wires = []
+	for p_id in get_ids():
+		for wire_id in player_wire_boxes[p_id].keys():
+			if not player_wire_boxes[p_id][wire_id]["is_cut"]:
+				uncut_wires.append({
+					"being_cut_id": p_id,
+					"wire_id": wire_id
+				})
+	return uncut_wires
+
 func get_ids() -> Array:
 	return player_id_name.keys()
 

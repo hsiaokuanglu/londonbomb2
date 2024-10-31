@@ -20,7 +20,7 @@ func set_history(history: Dictionary):
 	
 	for round_n in history.keys():
 		var round_tree = tree.create_item(root)
-		round_tree.set_text(0, str("round ", str(round_n)))
+		round_tree.set_text(0, str("countdown: ", str(round_n)))
 		for p_name in history[round_n].keys():
 			var being_cut_name = history[round_n][p_name]["cut_wire"]["being_cut_name"]
 			var wire_type = history[round_n][p_name]["cut_wire"]["wire_type"]
@@ -34,5 +34,7 @@ func _on_show_button_pressed() -> void:
 	var container =$VBoxContainer/ScrollContainer
 	if container.is_visible():
 		container.hide()
+		$VBoxContainer/Label.hide()
 	else:
 		container.show()
+		$VBoxContainer/Label.show()

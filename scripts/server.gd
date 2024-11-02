@@ -18,10 +18,13 @@ var delay_timer: Timer
 var last_cut_timer: Timer
 @export
 var defuse_timer: Timer
-
+@export
+var recap_timer: Timer
 
 func _ready():
 	_start_server()
+	round_timer.set_wait_time(GameLogic.ROUND_TIME_SEC)
+	recap_timer.set_wait_time(GameLogic.RECAP_TIME_SEC)
 
 
 func _start_server():
@@ -105,9 +108,9 @@ func _on_bomb_delay_timer_timeout():
 	round_timer.stop()
 	for client_id in game_data.get_ids():
 		if game_data["player_id_role"][client_id] == GameLogic.ROLE_GOOD:
-			rpc_id(client_id, "bomb_explode_client", false)
+			rpc_id(client_id, "bomb_explode_client", game_data.get_data_dict(), false)
 		else:
-			rpc_id(client_id, "bomb_explode_client", true)
+			rpc_id(client_id, "bomb_explode_client", game_data.get_data_dict(), true)
 
 func bomb_explodes():
 	delay_timer.start()
@@ -127,7 +130,8 @@ func bomb_defused():
 func _on_round_timer_timeout():
 	# TODO: clients, who have not cut, cut a random wire from others
 	game_logic.timer_timeout_random_cut()
-	rpc_all_clients("round_timer_timeout", [game_data.get_data_dict()])
+	
+	rpc_all_clients("before_recap_delay")
 
 @rpc("any_peer")
 func set_player_name(data: Dictionary):
@@ -191,14 +195,23 @@ func cut_wire(cutter_id: int, being_cut_id:int, wire_id: int):
 		bomb_defused()
 	else:
 		# check if all players have finished cut
-		if game_logic.check_next_round():
+		var check_result = game_logic.check_next_round()
+		if check_result == GameLogic.NEXT_ROUND:
+			last_cut_timer.start()
+			rpc_all_clients("before_recap_delay")
+		elif check_result == GameLogic.BOMB_DEFUSED:
+			bomb_defused()
+		elif check_result == GameLogic.BOMB_EXPLODES:
+			bomb_explodes()
+
 			#print(game_data["history"])
 			#print(game_data.get_uncut_wires())
-			if not game_started and game_data.current_round == 1:
-				# ran out of round, so bomb explodes
-				bomb_explodes()
-			else:
-				last_cut_timer.start()
+			#if game_data.current_round == 1:
+				## ran out of round, so bomb explodes
+				#bomb_explodes()
+			#else:
+				#last_cut_timer.start()
+				#rpc_all_clients("before_recap_delay")
 
 
 
@@ -228,7 +241,7 @@ func request_reconnect(id: int, p_name: String):
 
 # implemented in client
 @rpc
-func round_timer_timeout(_game_data: Dictionary):
+func before_recap_delay():
 	pass
 
 @rpc
@@ -292,11 +305,11 @@ func next_round(_game_data: Dictionary):
 	pass
 
 @rpc
-func bomb_explode_client(_is_winner: bool):
+func bomb_explode_client(_game_data: Dictionary, _is_winner: bool):
 	pass
 
 @rpc
-func bomb_defused_client(_is_winner: bool):
+func bomb_defused_client(_game_data: Dictionary, _is_winner: bool):
 	pass
 
 @rpc

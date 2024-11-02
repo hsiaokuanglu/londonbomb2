@@ -169,30 +169,34 @@ func _on_network_container_on_reconnect(p_name: String) -> void:
 		p_name)
 
 @rpc
-func round_timer_timeout(game_data: Dictionary):
-	pass
+func before_recap_delay():
+	round_number.start_round_countdown(GameLogic.ROUND_TIMEOUT_SEC)
 
 @rpc
-func bomb_defused_client(is_winner: bool):
+func bomb_defused_client(game_data: Dictionary, is_winner: bool):
 	in_game_ui.hide()
 	ending_panel.set_win_or_lose(is_winner)
 	ending_panel.set_result(GameLogic.BOMB_DEFUSED)
+	ending_panel.set_history(game_data["history"])
 	ending_panel.show()
 
 @rpc
-func bomb_explode_client(is_winner: bool):
+func bomb_explode_client(game_data: Dictionary, is_winner: bool):
 	in_game_ui.hide()
 	ending_panel.set_win_or_lose(is_winner)
 	ending_panel.set_result(GameLogic.BOMB_EXPLODES)
+	ending_panel.set_history(game_data["history"])
 	#
 	explode_panel.play_animation()
 
 @rpc
 func show_recap(game_data: Dictionary):
+	round_number.zero_timer_bar()
+	round_number.start_round_countdown(GameLogic.RECAP_TIME_SEC)
 	round_recap.show()
 	round_recap.set_history(game_data["history"])
 	round_recap.start_timer_bar()
-	round_number.start_recap()
+	#round_number.start_recap()
 
 @rpc("authority")
 func client_start_game(game_data: Dictionary):
@@ -224,7 +228,7 @@ func client_start_game(game_data: Dictionary):
 		update_bomb_claim(id, game_data["player_have_bomb_claim"][id])
 
 	show_in_game()
-	round_number.start_round_countdown()
+	round_number.start_round_countdown(GameLogic.ROUND_TIME_SEC)
 
 @rpc
 func update_history(history: Dictionary):
@@ -252,7 +256,7 @@ func show_wire_box(their_id: int, their_name: String, their_wire_box: Dictionary
 
 @rpc
 func next_round(game_data: Dictionary):
-	round_number.start_round_countdown()
+	round_number.start_round_countdown(GameLogic.ROUND_TIME_SEC)
 	round_recap.hide()
 	#_round_recap_timer(game_data)
 	# reset finished cut

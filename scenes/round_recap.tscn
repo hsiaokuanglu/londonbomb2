@@ -39,6 +39,7 @@ text = "Round Recap"
 horizontal_alignment = 1
 
 [node name="TimerBar" type="ProgressBar" parent="CenterContainer/VBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 max_value = 10.0

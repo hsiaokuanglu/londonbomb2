@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://blyctx4q4sohe"]
+[gd_scene load_steps=3 format=3 uid="uid://blyctx4q4sohe"]
 
 [ext_resource type="Script" path="res://scripts/ending_panel.gd" id="1_gaabg"]
+[ext_resource type="PackedScene" uid="uid://cl04ovbrt34te" path="res://scenes/history.tscn" id="2_1xv0b"]
 
 [node name="EndingPanel" type="Panel"]
 anchors_preset = 15
@@ -35,5 +36,8 @@ horizontal_alignment = 1
 [node name="RestartButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Restart"
+
+[node name="History" parent="." instance=ExtResource("2_1xv0b")]
+layout_mode = 1
 
 [connection signal="pressed" from="VBoxContainer/RestartButton" to="." method="_on_restart_button_pressed"]

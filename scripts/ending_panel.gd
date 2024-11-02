@@ -16,3 +16,6 @@ func set_result(game_result: String):
 
 func _on_restart_button_pressed() -> void:
 	restart.emit()
+
+func set_history(hist: Dictionary):
+	$History.set_history(hist)

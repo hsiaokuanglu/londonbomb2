@@ -11,7 +11,13 @@ var bomb_type = "bomb"
 # wire_results
 const BOMB_DEFUSED = "bomb_defused"
 const BOMB_EXPLODES = "bomb_explodes"
+const NEXT_ROUND = "next_round"
+const NOT_ALL_HAS_CUT = "not_all_has_cut"
 var server: Variant
+# timer time
+const ROUND_TIME_SEC = 4
+const ROUND_TIMEOUT_SEC = 1
+const RECAP_TIME_SEC = 2
 
 func set_server(_server):
 	server = _server
@@ -140,13 +146,20 @@ func cut_wire_logic(cutter_id: int, being_cut_id:int, wire_id: int):
 		#return ""
 	return ""
 
-func check_next_round():
+func check_next_round() -> String:
+	# check if all defuse is cut
+	if game_data.remaining_defuse_wire == 0:
+		return BOMB_DEFUSED
 	# check if all players have cut
 	var all_fin_cut = true
 	for fin_cut in game_data.player_finished_cut.values():
 		all_fin_cut = all_fin_cut and fin_cut
-	return all_fin_cut
-
+	if all_fin_cut and game_data.current_round == 1 and game_data.remaining_defuse_wire > 0:
+		return BOMB_EXPLODES
+	if all_fin_cut:
+		return NEXT_ROUND
+	else:
+		return NOT_ALL_HAS_CUT
 
 
 func timer_timeout_random_cut():
@@ -156,10 +169,17 @@ func timer_timeout_random_cut():
 	var uncut_wires = game_data.get_uncut_wires()
 	uncut_wires.shuffle()
 	for i in range(players.size()):
-		#cutter_id: int, being_cut_id:int, wire_id: int
-		var being_cut_id = uncut_wires[i]["being_cut_id"]
-		var wire_id = uncut_wires[i]["wire_id"]
-		print("cutter: " , str(players[i]),
-			", being_cut: ", str(being_cut_id),
-			", wire_type: ", str(game_data.player_wire_boxes[being_cut_id][wire_id]["type"]))
-		server.cut_wire(players[i], being_cut_id, wire_id)
+		for j in range(uncut_wires.size()):
+			var being_cut_id = uncut_wires[j]["being_cut_id"]
+			var wire_id = uncut_wires[j]["wire_id"]
+			# can not cut own wire
+			var _dev_hack = game_data.player_wire_boxes[being_cut_id][wire_id]["type"] == "safe" or \
+							game_data.player_wire_boxes[being_cut_id][wire_id]["type"] == "defuse" 
+			if not being_cut_id == players[i]:# and dev_hack:
+				uncut_wires.pop_at(j) # remove it from uncut wires
+				print("cutter: " , str(players[i]),
+					", being_cut: ", str(being_cut_id),
+					", wire_type: ", str(game_data.player_wire_boxes[being_cut_id][wire_id]["type"]))
+				#cutter_id: int, being_cut_id:int, wire_id: int
+				server.cut_wire(players[i], being_cut_id, wire_id)
+				break

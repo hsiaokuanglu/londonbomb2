@@ -2,11 +2,12 @@
 
 [ext_resource type="Script" path="res://scripts/server.gd" id="1_k8h5i"]
 
-[node name="Server" type="Node" node_paths=PackedStringArray("delay_timer", "last_cut_timer", "defuse_timer")]
+[node name="Server" type="Node" node_paths=PackedStringArray("delay_timer", "last_cut_timer", "defuse_timer", "recap_timer")]
 script = ExtResource("1_k8h5i")
 delay_timer = NodePath("BombDelayTimer")
 last_cut_timer = NodePath("LastCutTimer")
 defuse_timer = NodePath("DefuseDelayTimer")
+recap_timer = NodePath("RecapTimer")
 
 [node name="Dev" type="Label" parent="."]
 anchors_preset = 5
@@ -25,6 +26,7 @@ one_shot = true
 
 [node name="RoundTimer" type="Timer" parent="."]
 wait_time = 60.0
+one_shot = true
 
 [node name="BombDelayTimer" type="Timer" parent="."]
 one_shot = true

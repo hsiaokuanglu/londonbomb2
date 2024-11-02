@@ -16,14 +16,14 @@ func set_history(history: Dictionary):
 
 	for round_n in history.keys():
 		var round_tree = tree.create_item(root)
-		round_tree.set_text(0, str("round ", str(round_n)))
+		round_tree.set_text(0, str("countdown ", str(round_n)))
 		for p_name in history[round_n].keys():
 			var being_cut_name = history[round_n][p_name]["cut_wire"]["being_cut_name"]
 			var wire_type = history[round_n][p_name]["cut_wire"]["wire_type"]
 			var cut_action_tree = tree.create_item(round_tree)
 			var cut_str = str(p_name, " cut ", being_cut_name, "\'s wires: ", wire_type)
 			cut_action_tree.set_text(0, cut_str)
-	
+
 
 func set_timer_bar(value: float):
 	timer_bar.set_value_no_signal(value)
@@ -31,7 +31,7 @@ func set_timer_bar(value: float):
 		start_bar = false
 
 func start_timer_bar():
-	timer_bar.set_value_no_signal(10)
+	timer_bar.set_value_no_signal(GameLogic.RECAP_TIME_SEC)
 	start_bar = true
 
 func _process(delta: float) -> void:
